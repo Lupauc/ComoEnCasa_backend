@@ -7,7 +7,8 @@
         "dev": "tsx watch src/server.ts",
         "build": "tsc",
         "start": "node dist/server.js",
-        "lint": "tsc --noEmit"
+        "lint": "tsc --noEmit",
+        "diagram:uml": "tsuml2 --glob './src/**/!(*.d).ts' --tsconfig './tsconfig.json' --outFile '../Documentacion/diagramas_automaticos/backend/backend-class-diagram.svg' --outDsl '../Documentacion/diagramas_automaticos/backend/backend-class-diagram.nomnoml' --outMermaidDsl '../Documentacion/diagramas_automaticos/backend/backend-class-diagram.mmd' --memberAssociations --exportedTypesOnly"
     },
     "dependencies": {
         "bcryptjs": "^2.4.3",
@@ -37,6 +38,7 @@
         "@types/passport": "^1.0.16",
         "@types/passport-google-oauth20": "^2.0.16",
         "@types/streamifier": "^0.1.2",
+        "tsuml2": "^0.17.1",
         "tsx": "^4.19.1",
         "typescript": "^5.6.3"
     }
