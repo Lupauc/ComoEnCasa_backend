@@ -8,7 +8,6 @@ export const sendVerificationEmail = async (
     name: string,
     token: string
 ): Promise<void> => {
-    // Monto el enlace aquí para no repetir la ruta de verificación en el controlador.
     const linkVerificacion = `${env.FRONTEND_URL}/verify-email/${token}`;
 
     await clienteEmail.emails.send({

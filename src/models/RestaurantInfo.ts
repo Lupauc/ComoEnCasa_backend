@@ -1,4 +1,3 @@
-// src/models/RestaurantInfo.ts  (ACTUALIZADO — añade galería)
 import mongoose, { Document, Schema } from 'mongoose';
 
 export interface IScheduleEntry { days: string; openTime: string; closeTime: string; }
@@ -36,7 +35,6 @@ const RestaurantInfoSchema = new Schema<IRestaurantInfo>(
             lat: { type: Number, default: 40.3523 },
             lng: { type: Number, default: -3.5224 },
         },
-        // ✅ NUEVO: galería de fotos del local
         gallery: {
             type: [{
                 url: { type: String, required: true },

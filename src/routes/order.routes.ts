@@ -12,17 +12,11 @@ import { protect } from '../middlewares/auth.middleware';
 import { adminOnly } from '../middlewares/admin.middleware';
 
 const router = Router();
-
-// Todas las rutas de pedidos requieren autenticación
 router.use(protect);
-
-// Rutas de cliente
 router.post('/', createOrder);
 router.get('/my-orders', getMyOrders);
 router.get('/my-orders/:id', getMyOrderById);
 router.put('/my-orders/:id/cancel', cancelMyOrder);
-
-// Rutas de administrador
 router.get('/', adminOnly, getAllOrders);
 router.get('/:id', adminOnly, getOrderById);
 router.put('/:id/status', adminOnly, updateOrderStatus);

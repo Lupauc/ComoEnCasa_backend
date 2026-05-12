@@ -15,12 +15,9 @@ passport.use(
             try {
                 const email = profile.emails?.[0]?.value;
                 if (!email) return done(new Error('Google no ha devuelto ningún correo electrónico.'), undefined);
-
-                // Comprueba si el usuario ya existe por googleId o por email.
                 let user = await User.findOne({ $or: [{ googleId: profile.id }, { email }] });
 
                 if (user) {
-                    // Actualiza googleId si antes se registró con email y contraseña.
                     if (!user.googleId) {
                         user.googleId = profile.id;
                         user.isEmailVerified = true;
@@ -29,8 +26,6 @@ passport.use(
                     }
                     return done(null, user);
                 }
-
-                // Crea un usuario nuevo a partir del perfil de Google.
                 user = await User.create({
                     googleId: profile.id,
                     name: profile.displayName,

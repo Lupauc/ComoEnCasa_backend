@@ -76,22 +76,16 @@ const UserSchema = new Schema<IUser>(
         timestamps: true,
     }
 );
-
-// Encriptamos contraseña antes de guardar
 UserSchema.pre('save', async function (next) {
     if (!this.isModified('password') || !this.password) return next();
     const salt = await bcrypt.genSalt(12);
     this.password = await bcrypt.hash(this.password, salt);
     next();
 });
-
-// Comparamos contraseñas
 UserSchema.methods.comparePassword = async function (candidatePassword: string): Promise<boolean> {
     if (!this.password) return false;
     return bcrypt.compare(candidatePassword, this.password);
 };
-
-// Remove sensitive fields from JSON output
 UserSchema.methods.toJSON = function () {
     const obj = this.toObject();
     delete obj.password;

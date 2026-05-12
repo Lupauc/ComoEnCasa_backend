@@ -51,7 +51,6 @@ export const login = async (req: Request, res: Response, next: NextFunction): Pr
 
 export const verifyEmail = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-        // El token del correo se compara hasheado para no guardar el valor real en base de datos.
         const tokenHasheado = crypto.createHash('sha256').update(req.params.token).digest('hex');
         const usuario = await User.findOne({
             emailVerificationToken: tokenHasheado,
@@ -90,8 +89,6 @@ export const forgotPassword = async (req: Request, res: Response, next: NextFunc
     try {
         const { email } = req.body;
         const respuestaGenerica = { success: true, message: 'Si el correo existe, te hemos enviado un enlace para restablecer la contraseña.' };
-        // La contraseña tiene select:false en el modelo, así que la pedimos explícitamente
-        // para distinguir usuarios con login clásico de cuentas creadas solo con Google.
         const usuario = await User.findOne({ email }).select('+password');
         if (!usuario || !usuario.password) { res.json(respuestaGenerica); return; }
 

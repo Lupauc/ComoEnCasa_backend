@@ -17,7 +17,7 @@ import { protect } from '../middlewares/auth.middleware';
 const router = Router();
 
 const authLimiter = rateLimit({
-    windowMs: 15 * 60 * 1000, // 15 minutos
+    windowMs: 15 * 60 * 1000,
     max: 10,
     message: { success: false, message: 'Demasiados intentos. Vuelve a intentarlo dentro de 15 minutos.' },
     standardHeaders: true,
@@ -30,16 +30,12 @@ router.get('/verify-email/:token', verifyEmail);
 router.post('/resend-verification', authLimiter, resendVerification);
 router.post('/forgot-password', authLimiter, forgotPassword);
 router.post('/reset-password/:token', authLimiter, resetPassword);
-
-// Acceso con Google
 router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'], session: false }));
 router.get(
     '/google/callback',
     passport.authenticate('google', { session: false, failureRedirect: `${process.env.FRONTEND_URL}/login?error=oauth` }),
     googleCallback
 );
-
-// Rutas protegidas
 router.get('/me', protect, getMe);
 router.post('/logout', protect, logout);
 

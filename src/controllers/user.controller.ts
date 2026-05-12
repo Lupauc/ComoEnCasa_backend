@@ -3,12 +3,10 @@ import User from '../models/User';
 import { uploadToCloudinary, deleteFromCloudinary } from '../services/cloudinary.service';
 import { createError } from '../middlewares/errorHandler';
 
-// GET /api/users/profile
 export const getProfile = async (req: Request, res: Response): Promise<void> => {
     res.json({ success: true, data: { user: req.user } });
 };
 
-// PUT /api/users/profile
 export const updateProfile = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
         const { name, phone } = req.body;
@@ -31,7 +29,6 @@ export const updateProfile = async (req: Request, res: Response, next: NextFunct
     }
 };
 
-// PUT /api/users/profile/avatar
 export const updateAvatar = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
         if (!req.file) {
@@ -58,7 +55,6 @@ export const updateAvatar = async (req: Request, res: Response, next: NextFuncti
     }
 };
 
-// PUT /api/users/change-password
 export const changePassword = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
         const { currentPassword, newPassword } = req.body;
@@ -82,7 +78,6 @@ export const changePassword = async (req: Request, res: Response, next: NextFunc
     }
 };
 
-// GET /api/users  [ADMIN]
 export const getAllUsers = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
         const page = parseInt(req.query.page as string) || 1;
@@ -106,7 +101,6 @@ export const getAllUsers = async (req: Request, res: Response, next: NextFunctio
     }
 };
 
-// GET /api/users/:id  [ADMIN]
 export const getUserById = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
         const user = await User.findById(req.params.id);
@@ -117,7 +111,6 @@ export const getUserById = async (req: Request, res: Response, next: NextFunctio
     }
 };
 
-// DELETE /api/users/:id  [ADMIN]
 export const deleteUser = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
         const user = await User.findById(req.params.id);

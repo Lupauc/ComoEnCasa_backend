@@ -1,4 +1,3 @@
-// src/controllers/restaurant.controller.ts  (ACTUALIZADO — galería)
 import { Request, Response, NextFunction } from 'express';
 import RestaurantInfo from '../models/RestaurantInfo';
 import { uploadToCloudinary, deleteFromCloudinary } from '../services/cloudinary.service';
@@ -32,7 +31,6 @@ export const updateRestaurantInfo = async (req: Request, res: Response, next: Ne
     } catch (error) { next(error); }
 };
 
-// POST /api/restaurant/gallery — sube una foto al local
 export const addGalleryPhoto = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
         if (!req.file) return next(createError('No se ha proporcionado ninguna imagen.', 400));
@@ -49,7 +47,6 @@ export const addGalleryPhoto = async (req: Request, res: Response, next: NextFun
     } catch (error) { next(error); }
 };
 
-// DELETE /api/restaurant/gallery/:publicId — elimina una foto
 export const deleteGalleryPhoto = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
         const { publicId } = req.params;

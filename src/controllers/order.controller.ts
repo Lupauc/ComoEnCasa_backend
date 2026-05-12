@@ -11,7 +11,6 @@ const VALID_TRANSITIONS: Record<OrderStatus, OrderStatus[]> = {
     cancelled: [],
 };
 
-// POST /api/orders
 export const createOrder = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
         const user = req.user!;
@@ -50,7 +49,6 @@ export const createOrder = async (req: Request, res: Response, next: NextFunctio
     } catch (error) { next(error); }
 };
 
-// GET /api/orders/my-orders
 export const getMyOrders = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
         const orders = await Order.find({ user: req.user!._id }).sort({ createdAt: -1 }).populate('items.product', 'name image');
@@ -58,7 +56,6 @@ export const getMyOrders = async (req: Request, res: Response, next: NextFunctio
     } catch (error) { next(error); }
 };
 
-// GET /api/orders/my-orders/:id
 export const getMyOrderById = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
         const order = await Order.findOne({ _id: req.params.id, user: req.user!._id }).populate('items.product');
@@ -67,7 +64,6 @@ export const getMyOrderById = async (req: Request, res: Response, next: NextFunc
     } catch (error) { next(error); }
 };
 
-// PUT /api/orders/my-orders/:id/cancel
 export const cancelMyOrder = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
         const order = await Order.findOne({ _id: req.params.id, user: req.user!._id });
@@ -81,7 +77,6 @@ export const cancelMyOrder = async (req: Request, res: Response, next: NextFunct
     } catch (error) { next(error); }
 };
 
-// GET /api/orders [ADMIN]
 export const getAllOrders = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
         const { status, date, search } = req.query;
@@ -100,7 +95,6 @@ export const getAllOrders = async (req: Request, res: Response, next: NextFuncti
     } catch (error) { next(error); }
 };
 
-// GET /api/orders/:id [ADMIN]
 export const getOrderById = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
         const order = await Order.findById(req.params.id).populate('user', 'name email phone').populate('items.product', 'name image');
@@ -109,7 +103,6 @@ export const getOrderById = async (req: Request, res: Response, next: NextFuncti
     } catch (error) { next(error); }
 };
 
-// PUT /api/orders/:id/status [ADMIN] — acepta cancelReason opcional
 export const updateOrderStatus = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
         const { status, cancelReason } = req.body as { status: OrderStatus; cancelReason?: string };

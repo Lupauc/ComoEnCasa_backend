@@ -42,8 +42,6 @@ export const optionalAuth = async (req: Request, res: Response, next: NextFuncti
             const user = await User.findById(decoded.id);
             if (user) req.user = user;
         }
-    } catch {
-        // token inválido o ausente — continuar sin usuario
-    }
+    } catch {}
     next();
 };

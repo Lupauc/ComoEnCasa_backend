@@ -2,7 +2,6 @@ import { Request, Response, NextFunction } from 'express';
 import Contact from '../models/Contact';
 import { createError } from '../middlewares/errorHandler';
 
-// POST /api/contact  — público
 export const createContact = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
         const { name, email, phone, subject, message, acceptedPrivacy } = req.body;
@@ -28,7 +27,6 @@ export const createContact = async (req: Request, res: Response, next: NextFunct
     } catch (error) { next(error); }
 };
 
-// GET /api/contact  [ADMIN]
 export const getContacts = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
         const page = parseInt(req.query.page as string) || 1;
@@ -47,7 +45,6 @@ export const getContacts = async (req: Request, res: Response, next: NextFunctio
     } catch (error) { next(error); }
 };
 
-// PUT /api/contact/:id/read  [ADMIN]
 export const markAsRead = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
         const contact = await Contact.findByIdAndUpdate(req.params.id, { isRead: true }, { new: true });
@@ -56,7 +53,6 @@ export const markAsRead = async (req: Request, res: Response, next: NextFunction
     } catch (error) { next(error); }
 };
 
-// DELETE /api/contact/:id  [ADMIN]
 export const deleteContact = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
         const contact = await Contact.findByIdAndDelete(req.params.id);

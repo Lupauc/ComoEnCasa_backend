@@ -3,7 +3,6 @@ import Category from '../models/Category';
 import Product from '../models/Product';
 import { createError } from '../middlewares/errorHandler';
 
-// GET /api/categories
 export const getCategories = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
         const filter = req.user?.role === 'admin' ? {} : { isActive: true };
@@ -14,7 +13,6 @@ export const getCategories = async (req: Request, res: Response, next: NextFunct
     }
 };
 
-// GET /api/categories/:id
 export const getCategoryById = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
         const category = await Category.findById(req.params.id);
@@ -28,7 +26,6 @@ export const getCategoryById = async (req: Request, res: Response, next: NextFun
     }
 };
 
-// POST /api/categories  [ADMIN]
 export const createCategory = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
         const { name, slug, emoji, order } = req.body;
@@ -36,7 +33,6 @@ export const createCategory = async (req: Request, res: Response, next: NextFunc
         const existing = await Category.findOne({ slug });
         if (existing) return next(createError('Ya existe una categoría con ese slug.', 409));
 
-        // Si no viene un orden, la coloco al final automáticamente.
         const maxOrder = await Category.find().sort({ order: -1 }).limit(1);
         const nextOrder = order ?? (maxOrder[0] ? maxOrder[0].order + 1 : 0);
 
@@ -47,7 +43,6 @@ export const createCategory = async (req: Request, res: Response, next: NextFunc
     }
 };
 
-// PUT /api/categories/:id  [ADMIN]
 export const updateCategory = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
         const { name, slug, emoji, isActive } = req.body;
@@ -71,7 +66,6 @@ export const updateCategory = async (req: Request, res: Response, next: NextFunc
     }
 };
 
-// DELETE /api/categories/:id  [ADMIN]
 export const deleteCategory = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
         const productCount = await Product.countDocuments({ category: req.params.id });
@@ -88,7 +82,6 @@ export const deleteCategory = async (req: Request, res: Response, next: NextFunc
     }
 };
 
-// PUT /api/categories/reorder  [ADMIN]
 export const reorderCategories = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
         const { ids } = req.body as { ids: string[] };

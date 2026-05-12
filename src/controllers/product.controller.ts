@@ -3,13 +3,11 @@ import Product from '../models/Product';
 import { uploadToCloudinary, deleteFromCloudinary } from '../services/cloudinary.service';
 import { createError } from '../middlewares/errorHandler';
 
-// GET /api/products
 export const getProducts = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
         const { category, featured, search, available } = req.query;
         const filter: Record<string, unknown> = {};
 
-        // Los usuarios públicos solo ven productos disponibles; el admin los ve todos.
         if (req.user?.role !== 'admin') {
             filter.isAvailable = true;
         } else if (available !== undefined) {
@@ -17,7 +15,6 @@ export const getProducts = async (req: Request, res: Response, next: NextFunctio
         }
 
         if (category) {
-            // Permite filtrar por slug de categoría o por id.
             const Category = (await import('../models/Category')).default;
             const cat = await Category.findOne({ $or: [{ slug: category }, { _id: category }] });
             if (cat) filter.category = cat._id;
@@ -43,7 +40,6 @@ export const getProducts = async (req: Request, res: Response, next: NextFunctio
     }
 };
 
-// GET /api/products/menu — productos agrupados por categoría para la página del menú
 export const getMenu = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
         const Category = (await import('../models/Category')).default;
@@ -61,7 +57,6 @@ export const getMenu = async (req: Request, res: Response, next: NextFunction): 
             })
         );
 
-        // Quita las categorías que se quedarían vacías.
         const filteredMenu = menu.filter((section) => section.products.length > 0);
 
         res.json({ success: true, data: { menu: filteredMenu } });
@@ -70,7 +65,6 @@ export const getMenu = async (req: Request, res: Response, next: NextFunction): 
     }
 };
 
-// GET /api/products/:id
 export const getProductById = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
         const product = await Product.findById(req.params.id).populate('category', 'name slug emoji');
@@ -81,7 +75,6 @@ export const getProductById = async (req: Request, res: Response, next: NextFunc
     }
 };
 
-// POST /api/products  [ADMIN]
 export const createProduct = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
         const { name, description, price, category, ingredients, allergens, isAvailable, isFeatured, order } = req.body;
@@ -117,7 +110,6 @@ export const createProduct = async (req: Request, res: Response, next: NextFunct
     }
 };
 
-// PUT /api/products/:id  [ADMIN]
 export const updateProduct = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
         const { name, description, price, category, ingredients, allergens, isAvailable, isFeatured, order } = req.body;
@@ -146,7 +138,6 @@ export const updateProduct = async (req: Request, res: Response, next: NextFunct
     }
 };
 
-// PUT /api/products/:id/image  [ADMIN]
 export const updateProductImage = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
         if (!req.file) return next(createError('No se ha proporcionado ninguna imagen.', 400));
@@ -154,7 +145,6 @@ export const updateProductImage = async (req: Request, res: Response, next: Next
         const product = await Product.findById(req.params.id);
         if (!product) return next(createError('Producto no encontrado.', 404));
 
-        // Borra la imagen anterior antes de guardar la nueva.
         if (product.imagePublicId) {
             await deleteFromCloudinary(product.imagePublicId);
         }
@@ -170,7 +160,6 @@ export const updateProductImage = async (req: Request, res: Response, next: Next
     }
 };
 
-// PUT /api/products/:id/availability  [ADMIN]
 export const toggleAvailability = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
         const product = await Product.findById(req.params.id);
@@ -189,7 +178,6 @@ export const toggleAvailability = async (req: Request, res: Response, next: Next
     }
 };
 
-// DELETE /api/products/:id  [ADMIN]
 export const deleteProduct = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
         const product = await Product.findById(req.params.id);
@@ -207,7 +195,6 @@ export const deleteProduct = async (req: Request, res: Response, next: NextFunct
     }
 };
 
-// PUT /api/products/reorder  [ADMIN]
 export const reorderProducts = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
         const { ids } = req.body as { ids: string[] };

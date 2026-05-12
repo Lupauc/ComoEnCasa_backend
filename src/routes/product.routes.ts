@@ -15,13 +15,9 @@ import { adminOnly } from '../middlewares/admin.middleware';
 import { upload } from '../middlewares/upload.middleware';
 
 const router = Router();
-
-// Públicas
 router.get('/menu', getMenu);
 router.get('/', getProducts);
 router.get('/:id', getProductById);
-
-// Administrador
 router.post('/', protect, adminOnly, upload.single('image'), createProduct);
 router.put('/reorder', protect, adminOnly, reorderProducts);
 router.put('/:id', protect, adminOnly, updateProduct);
