@@ -6,6 +6,8 @@ export interface IContact extends Document {
     phone?: string;
     subject: string;
     message: string;
+    acceptedPrivacy: boolean;
+    acceptedPrivacyAt: Date;
     isRead: boolean;
     createdAt: Date;
 }
@@ -17,6 +19,8 @@ const ContactSchema = new Schema<IContact>(
         phone: { type: String, trim: true, default: '' },
         subject: { type: String, required: true, trim: true, maxlength: 200 },
         message: { type: String, required: true, trim: true, maxlength: 2000 },
+        acceptedPrivacy: { type: Boolean, required: true, default: false },
+        acceptedPrivacyAt: { type: Date, required: true },
         isRead: { type: Boolean, default: false },
     },
     { timestamps: true }

@@ -5,8 +5,21 @@ import { createError } from '../middlewares/errorHandler';
 // POST /api/contact  — público
 export const createContact = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-        const { name, email, phone, subject, message } = req.body;
-        const contact = await Contact.create({ name, email, phone, subject, message });
+        const { name, email, phone, subject, message, acceptedPrivacy } = req.body;
+
+        if (!acceptedPrivacy) {
+            return next(createError('Debes aceptar la política de privacidad para enviar el formulario.', 400));
+        }
+
+        const contact = await Contact.create({
+            name,
+            email,
+            phone,
+            subject,
+            message,
+            acceptedPrivacy: true,
+            acceptedPrivacyAt: new Date(),
+        });
         res.status(201).json({
             success: true,
             message: '¡Mensaje enviado! Nos pondremos en contacto contigo pronto.',
