@@ -33,7 +33,7 @@ export const sendVerificationEmail = async (
                 Verificar mi cuenta
               </a>
             </div>
-            <p style="color: #888; font-size: 14px;">Este enlace expirará en 24 horas. Si no creaste esta cuenta, puedes ignorar este email.</p>
+            <p style="color: #888; font-size: 14px;">Este enlace expirará en 24 horas. Si no creaste esta cuenta, puedes ignorar este correo.</p>
             <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;">
             <p style="color: #aaa; font-size: 12px; text-align: center;">
               ComoEnCasa · Pza. de la Constitución, 2 · Rivas-Vaciamadrid<br>
@@ -75,7 +75,7 @@ export const sendPasswordResetEmail = async (
                 Restablecer contraseña
               </a>
             </div>
-            <p style="color: #888; font-size: 14px;">Este enlace expirará en 1 hora. Si no solicitaste este cambio, ignora este email.</p>
+            <p style="color: #888; font-size: 14px;">Este enlace expirará en 1 hora. Si no solicitaste este cambio, ignora este correo.</p>
             <hr style="border: none; border-top: 1px solid #eee; margin: 20px 0;">
             <p style="color: #aaa; font-size: 12px; text-align: center;">
               ComoEnCasa · Pza. de la Constitución, 2 · Rivas-Vaciamadrid

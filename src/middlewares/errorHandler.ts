@@ -12,7 +12,7 @@ export const errorHandler = (
     _next: NextFunction
 ): void => {
     const statusCode = err.statusCode || 500;
-    const message = err.message || 'Internal Server Error';
+    const message = err.message || 'Error interno del servidor';
 
     if (process.env.NODE_ENV === 'development') {
         console.error('Error:', err);
@@ -28,7 +28,7 @@ export const errorHandler = (
 export const notFound = (req: Request, res: Response): void => {
     res.status(404).json({
         success: false,
-        message: `Route not found: ${req.method} ${req.originalUrl}`,
+        message: `Ruta no encontrada: ${req.method} ${req.originalUrl}`,
     });
 };
 

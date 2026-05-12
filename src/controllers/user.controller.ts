@@ -23,9 +23,9 @@ export const updateProfile = async (req: Request, res: Response, next: NextFunct
             { new: true, runValidators: true }
         );
 
-        if (!user) return next(createError('User not found.', 404));
+        if (!user) return next(createError('Usuario no encontrado.', 404));
 
-        res.json({ success: true, message: 'Profile updated.', data: { user } });
+        res.json({ success: true, message: 'Perfil actualizado.', data: { user } });
     } catch (error) {
         next(error);
     }
@@ -35,7 +35,7 @@ export const updateProfile = async (req: Request, res: Response, next: NextFunct
 export const updateAvatar = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
         if (!req.file) {
-            return next(createError('No image provided.', 400));
+            return next(createError('No se ha proporcionado ninguna imagen.', 400));
         }
 
         const user = req.user!;
@@ -52,7 +52,7 @@ export const updateAvatar = async (req: Request, res: Response, next: NextFuncti
             { new: true }
         );
 
-        res.json({ success: true, message: 'Avatar updated.', data: { avatar: result.secure_url, user: updated } });
+        res.json({ success: true, message: 'Avatar actualizado.', data: { avatar: result.secure_url, user: updated } });
     } catch (error) {
         next(error);
     }
@@ -65,18 +65,18 @@ export const changePassword = async (req: Request, res: Response, next: NextFunc
         const user = await User.findById(req.user!._id).select('+password');
 
         if (!user || !user.password) {
-            return next(createError('Password change not available for OAuth accounts.', 400));
+            return next(createError('El cambio de contraseña no está disponible para cuentas con acceso OAuth.', 400));
         }
 
         const isMatch = await user.comparePassword(currentPassword);
         if (!isMatch) {
-            return next(createError('Current password is incorrect.', 401));
+            return next(createError('La contraseña actual es incorrecta.', 401));
         }
 
         user.password = newPassword;
         await user.save();
 
-        res.json({ success: true, message: 'Password changed successfully.' });
+        res.json({ success: true, message: 'Contraseña cambiada correctamente.' });
     } catch (error) {
         next(error);
     }
@@ -110,7 +110,7 @@ export const getAllUsers = async (req: Request, res: Response, next: NextFunctio
 export const getUserById = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
         const user = await User.findById(req.params.id);
-        if (!user) return next(createError('User not found.', 404));
+        if (!user) return next(createError('Usuario no encontrado.', 404));
         res.json({ success: true, data: { user } });
     } catch (error) {
         next(error);
@@ -121,10 +121,10 @@ export const getUserById = async (req: Request, res: Response, next: NextFunctio
 export const deleteUser = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
         const user = await User.findById(req.params.id);
-        if (!user) return next(createError('User not found.', 404));
+        if (!user) return next(createError('Usuario no encontrado.', 404));
 
         if (user._id.toString() === req.user!._id.toString()) {
-            return next(createError('You cannot delete your own account.', 400));
+            return next(createError('No puedes eliminar tu propia cuenta.', 400));
         }
 
         if (user.avatarPublicId) {
@@ -133,7 +133,7 @@ export const deleteUser = async (req: Request, res: Response, next: NextFunction
 
         await user.deleteOne();
 
-        res.json({ success: true, message: 'User deleted successfully.' });
+        res.json({ success: true, message: 'Usuario eliminado correctamente.' });
     } catch (error) {
         next(error);
     }

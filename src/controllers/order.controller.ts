@@ -15,11 +15,11 @@ const VALID_TRANSITIONS: Record<OrderStatus, OrderStatus[]> = {
 export const createOrder = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
         const user = req.user!;
-        if (!user.isEmailVerified) return next(createError('Please verify your email before placing an order.', 403));
+        if (!user.isEmailVerified) return next(createError('Debes verificar tu correo antes de realizar un pedido.', 403));
 
         const { items, pickupDate, pickupTime, notes } = req.body;
         if (!items || !Array.isArray(items) || items.length === 0)
-            return next(createError('Order must contain at least one item.', 400));
+            return next(createError('El pedido debe contener al menos un producto.', 400));
 
         const Product = (await import('../models/Product')).default;
         const orderItems = [];
@@ -27,7 +27,7 @@ export const createOrder = async (req: Request, res: Response, next: NextFunctio
         for (const item of items) {
             const product = await Product.findById(item.product);
             if (!product || !product.isAvailable)
-                return next(createError(`Product ${item.product} not available.`, 400));
+                return next(createError(`El producto ${item.product} no está disponible.`, 400));
             const subtotal = product.price * item.quantity;
             total += subtotal;
             orderItems.push({ product: product._id, name: product.name, price: product.price, quantity: item.quantity, subtotal });
@@ -46,7 +46,7 @@ export const createOrder = async (req: Request, res: Response, next: NextFunctio
             statusHistory: [{ status: 'pending', changedAt: new Date(), changedBy: user._id }],
         });
 
-        res.status(201).json({ success: true, message: 'Order created.', data: { order } });
+        res.status(201).json({ success: true, message: 'Pedido realizado correctamente.', data: { order } });
     } catch (error) { next(error); }
 };
 
@@ -62,7 +62,7 @@ export const getMyOrders = async (req: Request, res: Response, next: NextFunctio
 export const getMyOrderById = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
         const order = await Order.findOne({ _id: req.params.id, user: req.user!._id }).populate('items.product');
-        if (!order) return next(createError('Order not found.', 404));
+        if (!order) return next(createError('Pedido no encontrado.', 404));
         res.json({ success: true, data: { order } });
     } catch (error) { next(error); }
 };
@@ -71,13 +71,13 @@ export const getMyOrderById = async (req: Request, res: Response, next: NextFunc
 export const cancelMyOrder = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
         const order = await Order.findOne({ _id: req.params.id, user: req.user!._id });
-        if (!order) return next(createError('Order not found.', 404));
+        if (!order) return next(createError('Pedido no encontrado.', 404));
         if (order.status !== 'pending')
-            return next(createError(`Cannot cancel order with status "${order.status}".`, 400));
+            return next(createError(`No se puede cancelar un pedido con estado "${order.status}".`, 400));
         order.status = 'cancelled';
         order.statusHistory.push({ status: 'cancelled', changedAt: new Date(), changedBy: req.user!._id });
         await order.save();
-        res.json({ success: true, message: 'Order cancelled.', data: { order } });
+        res.json({ success: true, message: 'Pedido cancelado.', data: { order } });
     } catch (error) { next(error); }
 };
 
@@ -104,7 +104,7 @@ export const getAllOrders = async (req: Request, res: Response, next: NextFuncti
 export const getOrderById = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
         const order = await Order.findById(req.params.id).populate('user', 'name email phone').populate('items.product', 'name image');
-        if (!order) return next(createError('Order not found.', 404));
+        if (!order) return next(createError('Pedido no encontrado.', 404));
         res.json({ success: true, data: { order } });
     } catch (error) { next(error); }
 };
@@ -114,11 +114,11 @@ export const updateOrderStatus = async (req: Request, res: Response, next: NextF
     try {
         const { status, cancelReason } = req.body as { status: OrderStatus; cancelReason?: string };
         const order = await Order.findById(req.params.id);
-        if (!order) return next(createError('Order not found.', 404));
+        if (!order) return next(createError('Pedido no encontrado.', 404));
 
         const allowedNext = VALID_TRANSITIONS[order.status];
         if (!allowedNext.includes(status))
-            return next(createError(`Cannot transition from "${order.status}" to "${status}". Allowed: ${allowedNext.join(', ') || 'none'}.`, 400));
+            return next(createError(`No se puede cambiar de "${order.status}" a "${status}". Permitidos: ${allowedNext.join(', ') || 'ninguno'}.`, 400));
 
         order.status = status;
         if (status === 'cancelled' && cancelReason?.trim()) {
@@ -127,6 +127,6 @@ export const updateOrderStatus = async (req: Request, res: Response, next: NextF
         order.statusHistory.push({ status, changedAt: new Date(), changedBy: req.user!._id });
         await order.save();
 
-        res.json({ success: true, message: `Order status updated to ${status}.`, data: { order } });
+        res.json({ success: true, message: `Estado del pedido actualizado a ${status}.`, data: { order } });
     } catch (error) { next(error); }
 };

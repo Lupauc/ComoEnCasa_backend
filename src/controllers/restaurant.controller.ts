@@ -35,7 +35,7 @@ export const updateRestaurantInfo = async (req: Request, res: Response, next: Ne
 // POST /api/restaurant/gallery — sube una foto al local
 export const addGalleryPhoto = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-        if (!req.file) return next(createError('No image provided.', 400));
+        if (!req.file) return next(createError('No se ha proporcionado ninguna imagen.', 400));
         const { caption } = req.body;
 
         let info = await RestaurantInfo.findOne();
@@ -56,10 +56,10 @@ export const deleteGalleryPhoto = async (req: Request, res: Response, next: Next
         const decodedId = decodeURIComponent(publicId);
 
         let info = await RestaurantInfo.findOne();
-        if (!info) return next(createError('Restaurant info not found.', 404));
+        if (!info) return next(createError('Información del restaurante no encontrada.', 404));
 
         const photo = info.gallery.find(p => p.publicId === decodedId);
-        if (!photo) return next(createError('Photo not found.', 404));
+        if (!photo) return next(createError('Foto no encontrada.', 404));
 
         await deleteFromCloudinary(decodedId);
         info.gallery = info.gallery.filter(p => p.publicId !== decodedId);

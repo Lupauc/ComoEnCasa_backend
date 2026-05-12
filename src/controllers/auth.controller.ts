@@ -11,7 +11,7 @@ export const register = async (req: Request, res: Response, next: NextFunction):
     try {
         const { name, email, password } = req.body;
         const usuarioYaCreado = await User.findOne({ email });
-        if (usuarioYaCreado) return next(createError('An account with this email already exists.', 409));
+        if (usuarioYaCreado) return next(createError('Ya existe una cuenta con este correo electrónico.', 409));
 
         const tokenVerificacion = generateRandomToken();
         const finTokenVerificacion = new Date(Date.now() + 24 * 60 * 60 * 1000);
@@ -27,7 +27,7 @@ export const register = async (req: Request, res: Response, next: NextFunction):
 
         res.status(201).json({
             success: true,
-            message: 'Account created successfully. Please check your email to verify your account.',
+            message: 'Cuenta creada correctamente. Revisa tu correo para verificar la cuenta.',
             data: { id: usuarioNuevo._id, name: usuarioNuevo.name, email: usuarioNuevo.email },
         });
     } catch (error) { next(error); }
@@ -37,15 +37,15 @@ export const login = async (req: Request, res: Response, next: NextFunction): Pr
     try {
         const { email, password } = req.body;
         const usuario = await User.findOne({ email }).select('+password');
-        if (!usuario) return next(createError('Invalid email or password.', 401));
-        if (!usuario.password) return next(createError('This account uses Google login. Please sign in with Google.', 401));
+        if (!usuario) return next(createError('Correo o contraseña incorrectos.', 401));
+        if (!usuario.password) return next(createError('Esta cuenta utiliza acceso con Google. Inicia sesión con Google.', 401));
 
         const passwordOk = await usuario.comparePassword(password);
-        if (!passwordOk) return next(createError('Invalid email or password.', 401));
-        if (!usuario.isEmailVerified) return next(createError('Please verify your email before logging in.', 403));
+        if (!passwordOk) return next(createError('Correo o contraseña incorrectos.', 401));
+        if (!usuario.isEmailVerified) return next(createError('Debes verificar tu correo antes de iniciar sesión.', 403));
 
         const jwtLogin = generateJWT(usuario);
-        res.json({ success: true, message: 'Login successful.', data: { token: jwtLogin, user: usuario } });
+        res.json({ success: true, message: 'Inicio de sesión correcto.', data: { token: jwtLogin, user: usuario } });
     } catch (error) { next(error); }
 };
 
@@ -57,7 +57,7 @@ export const verifyEmail = async (req: Request, res: Response, next: NextFunctio
             emailVerificationToken: tokenHasheado,
             emailVerificationExpires: { $gt: Date.now() },
         });
-        if (!usuario) return next(createError('Invalid or expired verification token.', 400));
+        if (!usuario) return next(createError('El enlace de verificación no es válido o ha caducado.', 400));
 
         usuario.isEmailVerified = true;
         usuario.emailVerificationToken = undefined;
@@ -65,7 +65,7 @@ export const verifyEmail = async (req: Request, res: Response, next: NextFunctio
         await usuario.save();
 
         const jwtLogin = generateJWT(usuario);
-        res.json({ success: true, message: 'Email verified successfully.', data: { token: jwtLogin, user: usuario } });
+        res.json({ success: true, message: 'Correo verificado correctamente.', data: { token: jwtLogin, user: usuario } });
     } catch (error) { next(error); }
 };
 
@@ -73,8 +73,8 @@ export const resendVerification = async (req: Request, res: Response, next: Next
     try {
         const { email } = req.body;
         const usuario = await User.findOne({ email });
-        if (!usuario) { res.json({ success: true, message: 'If that email exists, a verification link has been sent.' }); return; }
-        if (usuario.isEmailVerified) return next(createError('Email is already verified.', 400));
+        if (!usuario) { res.json({ success: true, message: 'Si el correo existe, se ha enviado un enlace de verificación.' }); return; }
+        if (usuario.isEmailVerified) return next(createError('El correo ya está verificado.', 400));
 
         const tokenVerificacion = generateRandomToken();
         usuario.emailVerificationToken = crypto.createHash('sha256').update(tokenVerificacion).digest('hex');
@@ -82,15 +82,17 @@ export const resendVerification = async (req: Request, res: Response, next: Next
         await usuario.save();
         await sendVerificationEmail(email, usuario.name, tokenVerificacion);
 
-        res.json({ success: true, message: 'If that email exists, a verification link has been sent.' });
+        res.json({ success: true, message: 'Si el correo existe, se ha enviado un enlace de verificación.' });
     } catch (error) { next(error); }
 };
 
 export const forgotPassword = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
         const { email } = req.body;
-        const respuestaGenerica = { success: true, message: 'If that email exists, a password reset link has been sent.' };
-        const usuario = await User.findOne({ email });
+        const respuestaGenerica = { success: true, message: 'Si el correo existe, te hemos enviado un enlace para restablecer la contraseña.' };
+        // La contraseña tiene select:false en el modelo, así que la pedimos explícitamente
+        // para distinguir usuarios con login clásico de cuentas creadas solo con Google.
+        const usuario = await User.findOne({ email }).select('+password');
         if (!usuario || !usuario.password) { res.json(respuestaGenerica); return; }
 
         const tokenReset = generateRandomToken();
@@ -108,14 +110,14 @@ export const resetPassword = async (req: Request, res: Response, next: NextFunct
         const { password } = req.body;
         const tokenHasheado = crypto.createHash('sha256').update(req.params.token).digest('hex');
         const usuario = await User.findOne({ passwordResetToken: tokenHasheado, passwordResetExpires: { $gt: Date.now() } });
-        if (!usuario) return next(createError('Invalid or expired reset token.', 400));
+        if (!usuario) return next(createError('El enlace para restablecer la contraseña no es válido o ha caducado.', 400));
 
         usuario.password = password;
         usuario.passwordResetToken = undefined;
         usuario.passwordResetExpires = undefined;
         await usuario.save();
 
-        res.json({ success: true, message: 'Password reset successfully. You can now log in.' });
+        res.json({ success: true, message: 'Contraseña restablecida correctamente. Ya puedes iniciar sesión.' });
     } catch (error) { next(error); }
 };
 
@@ -124,7 +126,7 @@ export const getMe = async (req: Request, res: Response): Promise<void> => {
 };
 
 export const logout = (_req: Request, res: Response): void => {
-    res.json({ success: true, message: 'Logged out successfully.' });
+    res.json({ success: true, message: 'Sesión cerrada correctamente.' });
 };
 
 export const googleCallback = async (req: Request, res: Response): Promise<void> => {

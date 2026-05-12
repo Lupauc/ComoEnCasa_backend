@@ -74,7 +74,7 @@ export const getMenu = async (req: Request, res: Response, next: NextFunction): 
 export const getProductById = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
         const product = await Product.findById(req.params.id).populate('category', 'name slug emoji');
-        if (!product) return next(createError('Product not found.', 404));
+        if (!product) return next(createError('Producto no encontrado.', 404));
         res.json({ success: true, data: { product } });
     } catch (error) {
         next(error);
@@ -111,7 +111,7 @@ export const createProduct = async (req: Request, res: Response, next: NextFunct
 
         const populated = await product.populate('category', 'name slug emoji');
 
-        res.status(201).json({ success: true, message: 'Product created.', data: { product: populated } });
+        res.status(201).json({ success: true, message: 'Producto creado.', data: { product: populated } });
     } catch (error) {
         next(error);
     }
@@ -138,9 +138,9 @@ export const updateProduct = async (req: Request, res: Response, next: NextFunct
             runValidators: true,
         }).populate('category', 'name slug emoji');
 
-        if (!product) return next(createError('Product not found.', 404));
+        if (!product) return next(createError('Producto no encontrado.', 404));
 
-        res.json({ success: true, message: 'Product updated.', data: { product } });
+        res.json({ success: true, message: 'Producto actualizado.', data: { product } });
     } catch (error) {
         next(error);
     }
@@ -149,10 +149,10 @@ export const updateProduct = async (req: Request, res: Response, next: NextFunct
 // PUT /api/products/:id/image  [ADMIN]
 export const updateProductImage = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-        if (!req.file) return next(createError('No image provided.', 400));
+        if (!req.file) return next(createError('No se ha proporcionado ninguna imagen.', 400));
 
         const product = await Product.findById(req.params.id);
-        if (!product) return next(createError('Product not found.', 404));
+        if (!product) return next(createError('Producto no encontrado.', 404));
 
         // Borra la imagen anterior antes de guardar la nueva.
         if (product.imagePublicId) {
@@ -164,7 +164,7 @@ export const updateProductImage = async (req: Request, res: Response, next: Next
         product.imagePublicId = result.public_id;
         await product.save();
 
-        res.json({ success: true, message: 'Image updated.', data: { image: product.image } });
+        res.json({ success: true, message: 'Imagen actualizada.', data: { image: product.image } });
     } catch (error) {
         next(error);
     }
@@ -174,14 +174,14 @@ export const updateProductImage = async (req: Request, res: Response, next: Next
 export const toggleAvailability = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
         const product = await Product.findById(req.params.id);
-        if (!product) return next(createError('Product not found.', 404));
+        if (!product) return next(createError('Producto no encontrado.', 404));
 
         product.isAvailable = !product.isAvailable;
         await product.save();
 
         res.json({
             success: true,
-            message: `Product is now ${product.isAvailable ? 'available' : 'unavailable'}.`,
+            message: `El producto ahora está ${product.isAvailable ? 'disponible' : 'no disponible'}.`,
             data: { isAvailable: product.isAvailable },
         });
     } catch (error) {
@@ -193,7 +193,7 @@ export const toggleAvailability = async (req: Request, res: Response, next: Next
 export const deleteProduct = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
         const product = await Product.findById(req.params.id);
-        if (!product) return next(createError('Product not found.', 404));
+        if (!product) return next(createError('Producto no encontrado.', 404));
 
         if (product.imagePublicId) {
             await deleteFromCloudinary(product.imagePublicId);
@@ -201,7 +201,7 @@ export const deleteProduct = async (req: Request, res: Response, next: NextFunct
 
         await product.deleteOne();
 
-        res.json({ success: true, message: 'Product deleted.' });
+        res.json({ success: true, message: 'Producto eliminado.' });
     } catch (error) {
         next(error);
     }
@@ -213,7 +213,7 @@ export const reorderProducts = async (req: Request, res: Response, next: NextFun
         const { ids } = req.body as { ids: string[] };
 
         if (!Array.isArray(ids) || ids.length === 0) {
-            return next(createError('ids must be a non-empty array.', 400));
+            return next(createError('El campo ids debe ser un array no vacío.', 400));
         }
 
         const bulkOps = ids.map((id, index) => ({
@@ -222,7 +222,7 @@ export const reorderProducts = async (req: Request, res: Response, next: NextFun
 
         await Product.bulkWrite(bulkOps);
 
-        res.json({ success: true, message: 'Products reordered.' });
+        res.json({ success: true, message: 'Productos reordenados.' });
     } catch (error) {
         next(error);
     }

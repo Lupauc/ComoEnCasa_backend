@@ -18,7 +18,7 @@ export const getCategories = async (req: Request, res: Response, next: NextFunct
 export const getCategoryById = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
         const category = await Category.findById(req.params.id);
-        if (!category) return next(createError('Category not found.', 404));
+        if (!category) return next(createError('Categoría no encontrada.', 404));
 
         const products = await Product.find({ category: category._id, isAvailable: true }).sort({ order: 1 });
 
@@ -34,14 +34,14 @@ export const createCategory = async (req: Request, res: Response, next: NextFunc
         const { name, slug, emoji, order } = req.body;
 
         const existing = await Category.findOne({ slug });
-        if (existing) return next(createError('A category with this slug already exists.', 409));
+        if (existing) return next(createError('Ya existe una categoría con ese slug.', 409));
 
         // Si no viene un orden, la coloco al final automáticamente.
         const maxOrder = await Category.find().sort({ order: -1 }).limit(1);
         const nextOrder = order ?? (maxOrder[0] ? maxOrder[0].order + 1 : 0);
 
         const category = await Category.create({ name, slug, emoji, order: nextOrder });
-        res.status(201).json({ success: true, message: 'Category created.', data: { category } });
+        res.status(201).json({ success: true, message: 'Categoría creada.', data: { category } });
     } catch (error) {
         next(error);
     }
@@ -54,7 +54,7 @@ export const updateCategory = async (req: Request, res: Response, next: NextFunc
 
         if (slug) {
             const existing = await Category.findOne({ slug, _id: { $ne: req.params.id } });
-            if (existing) return next(createError('A category with this slug already exists.', 409));
+            if (existing) return next(createError('Ya existe una categoría con ese slug.', 409));
         }
 
         const category = await Category.findByIdAndUpdate(
@@ -63,9 +63,9 @@ export const updateCategory = async (req: Request, res: Response, next: NextFunc
             { new: true, runValidators: true }
         );
 
-        if (!category) return next(createError('Category not found.', 404));
+        if (!category) return next(createError('Categoría no encontrada.', 404));
 
-        res.json({ success: true, message: 'Category updated.', data: { category } });
+        res.json({ success: true, message: 'Categoría actualizada.', data: { category } });
     } catch (error) {
         next(error);
     }
@@ -76,13 +76,13 @@ export const deleteCategory = async (req: Request, res: Response, next: NextFunc
     try {
         const productCount = await Product.countDocuments({ category: req.params.id });
         if (productCount > 0) {
-            return next(createError(`Cannot delete: this category has ${productCount} product(s). Move or delete them first.`, 400));
+            return next(createError(`No se puede eliminar: esta categoría tiene ${productCount} producto(s). Muévelos o elimínalos antes.`, 400));
         }
 
         const category = await Category.findByIdAndDelete(req.params.id);
-        if (!category) return next(createError('Category not found.', 404));
+        if (!category) return next(createError('Categoría no encontrada.', 404));
 
-        res.json({ success: true, message: 'Category deleted.' });
+        res.json({ success: true, message: 'Categoría eliminada.' });
     } catch (error) {
         next(error);
     }
@@ -94,7 +94,7 @@ export const reorderCategories = async (req: Request, res: Response, next: NextF
         const { ids } = req.body as { ids: string[] };
 
         if (!Array.isArray(ids) || ids.length === 0) {
-            return next(createError('ids must be a non-empty array.', 400));
+            return next(createError('El campo ids debe ser un array no vacío.', 400));
         }
 
         const bulkOps = ids.map((id, index) => ({
@@ -106,7 +106,7 @@ export const reorderCategories = async (req: Request, res: Response, next: NextF
 
         await Category.bulkWrite(bulkOps);
 
-        res.json({ success: true, message: 'Categories reordered.' });
+        res.json({ success: true, message: 'Categorías reordenadas.' });
     } catch (error) {
         next(error);
     }

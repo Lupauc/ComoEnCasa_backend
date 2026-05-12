@@ -24,21 +24,21 @@ const UserSchema = new Schema<IUser>(
     {
         name: {
             type: String,
-            required: [true, 'Name is required'],
+            required: [true, 'El nombre es obligatorio'],
             trim: true,
-            maxlength: [100, 'Name cannot exceed 100 characters'],
+            maxlength: [100, 'El nombre no puede superar los 100 caracteres'],
         },
         email: {
             type: String,
-            required: [true, 'Email is required'],
+            required: [true, 'El correo electrónico es obligatorio'],
             unique: true,
             lowercase: true,
             trim: true,
-            match: [/^\S+@\S+\.\S+$/, 'Please enter a valid email'],
+            match: [/^\S+@\S+\.\S+$/, 'Introduce un correo electrónico válido'],
         },
         password: {
             type: String,
-            minlength: [8, 'Password must be at least 8 characters'],
+            minlength: [8, 'La contraseña debe tener al menos 8 caracteres'],
             select: false,
         },
         googleId: {
@@ -56,7 +56,7 @@ const UserSchema = new Schema<IUser>(
         phone: {
             type: String,
             trim: true,
-            maxlength: [20, 'Phone cannot exceed 20 characters'],
+            maxlength: [20, 'El teléfono no puede superar los 20 caracteres'],
         },
         role: {
             type: String,

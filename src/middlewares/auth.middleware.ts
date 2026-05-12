@@ -12,7 +12,7 @@ export const protect = async (req: Request, res: Response, next: NextFunction): 
     const authHeader = req.headers.authorization;
 
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
-        res.status(401).json({ success: false, message: 'No token provided. Please log in.' });
+        res.status(401).json({ success: false, message: 'No se ha proporcionado token. Inicia sesión.' });
         return;
     }
 
@@ -23,14 +23,14 @@ export const protect = async (req: Request, res: Response, next: NextFunction): 
         const user = await User.findById(decoded.id);
 
         if (!user) {
-            res.status(401).json({ success: false, message: 'User no longer exists.' });
+            res.status(401).json({ success: false, message: 'El usuario ya no existe.' });
             return;
         }
 
         req.user = user;
         next();
     } catch {
-        res.status(401).json({ success: false, message: 'Invalid or expired token.' });
+        res.status(401).json({ success: false, message: 'Token no válido o caducado.' });
     }
 };
 

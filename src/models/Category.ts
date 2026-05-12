@@ -14,17 +14,17 @@ const CategorySchema = new Schema<ICategory>(
     {
         name: {
             type: String,
-            required: [true, 'Category name is required'],
+            required: [true, 'El nombre de la categoría es obligatorio'],
             trim: true,
-            maxlength: [80, 'Name cannot exceed 80 characters'],
+            maxlength: [80, 'El nombre no puede superar los 80 caracteres'],
         },
         slug: {
             type: String,
-            required: [true, 'Slug is required'],
+            required: [true, 'El slug es obligatorio'],
             unique: true,
             lowercase: true,
             trim: true,
-            match: [/^[a-z0-9_-]+$/, 'Slug can only contain lowercase letters, numbers, hyphens and underscores'],
+            match: [/^[a-z0-9_-]+$/, 'El slug solo puede contener letras minúsculas, números, guiones y guiones bajos'],
         },
         emoji: {
             type: String,

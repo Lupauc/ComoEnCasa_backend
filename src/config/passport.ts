@@ -14,7 +14,7 @@ passport.use(
         async (_accessToken, _refreshToken, profile, done) => {
             try {
                 const email = profile.emails?.[0]?.value;
-                if (!email) return done(new Error('No email from Google'), undefined);
+                if (!email) return done(new Error('Google no ha devuelto ningún correo electrónico.'), undefined);
 
                 // Comprueba si el usuario ya existe por googleId o por email.
                 let user = await User.findOne({ $or: [{ googleId: profile.id }, { email }] });

@@ -49,7 +49,7 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.get('/api/health', (_req, res) => {
   res.json({
     success: true,
-    message: '🔥 ComoEnCasa API is running',
+    message: '🔥 La API de ComoEnCasa está funcionando',
     environment: env.NODE_ENV,
     timestamp: new Date().toISOString(),
   });
