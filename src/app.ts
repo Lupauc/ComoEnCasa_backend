@@ -16,15 +16,23 @@ import { errorHandler, notFound } from './middlewares/errorHandler';
 const app = express();
 app.set('trust proxy', 1);
 app.use(helmet());
+if (env.NODE_ENV === 'development') {
+  app.use(morgan('dev'));
+} else {
+  app.use(morgan('combined'));
+}
 
 const allowedOrigins = env.FRONTEND_URLS.split(',')
   .map((origin) => origin.trim())
   .filter(Boolean);
 
+const isAllowedVercelFrontend = (origin: string): boolean =>
+  /^https:\/\/como-en-casa-frontend(?:-[a-z0-9-]+)?\.vercel\.app$/.test(origin);
+
 app.use(
   cors({
     origin(origin, callback) {
-      if (!origin || allowedOrigins.includes(origin)) {
+      if (!origin || allowedOrigins.includes(origin) || isAllowedVercelFrontend(origin)) {
         callback(null, true);
         return;
       }
@@ -36,11 +44,6 @@ app.use(
     allowedHeaders: ['Content-Type', 'Authorization'],
   })
 );
-if (env.NODE_ENV === 'development') {
-  app.use(morgan('dev'));
-} else {
-  app.use(morgan('combined'));
-}
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.get('/api/health', (_req, res) => {
