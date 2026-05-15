@@ -7,15 +7,16 @@ const levantarServidor = async () => {
     await connectDB();
 
     app.listen(env.PORT, () => {
+        const serverUrl = env.BACKEND_URL || `http://localhost:${env.PORT}`;
         console.log(`\nComoEnCasa API`);
         console.log(`Server running on port ${env.PORT}`);
         console.log(`Environment: ${env.NODE_ENV}`);
-        console.log(`Health: http://localhost:${env.PORT}/api/health`);
+        console.log(`Health: ${serverUrl}/api/health`);
         console.log('');
     });
 };
 
 levantarServidor().catch((error) => {
-    console.error('❌ Failed to start server:', error);
+    console.error('Failed to start server:', error);
     process.exit(1);
 });
