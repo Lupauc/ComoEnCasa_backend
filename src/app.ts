@@ -14,10 +14,23 @@ import contactRoutes from './routes/contact.routes';
 import { errorHandler, notFound } from './middlewares/errorHandler';
 
 const app = express();
+app.set('trust proxy', 1);
 app.use(helmet());
+
+const allowedOrigins = env.FRONTEND_URLS.split(',')
+  .map((origin) => origin.trim())
+  .filter(Boolean);
+
 app.use(
   cors({
-    origin: env.FRONTEND_URL,
+    origin(origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+        return;
+      }
+
+      callback(new Error('Origen no permitido por CORS.'));
+    },
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],

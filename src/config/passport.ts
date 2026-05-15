@@ -6,11 +6,13 @@ import { DEFAULT_AVATAR_URL } from './defaults';
 
 passport.use(
     new GoogleStrategy(
-        {
-            clientID: env.GOOGLE_CLIENT_ID,
-            clientSecret: env.GOOGLE_CLIENT_SECRET,
-            callbackURL: `/api/auth/google/callback`,
-        },
+            {
+                clientID: env.GOOGLE_CLIENT_ID,
+                clientSecret: env.GOOGLE_CLIENT_SECRET,
+                callbackURL: env.BACKEND_URL
+                    ? `${env.BACKEND_URL}/api/auth/google/callback`
+                    : `/api/auth/google/callback`,
+            },
         async (_accessToken, _refreshToken, profile, done) => {
             try {
                 const email = profile.emails?.[0]?.value;
